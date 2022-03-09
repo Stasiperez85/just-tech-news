@@ -1,13 +1,11 @@
 const router = require('express').Router();
 const sequelize = require('../../config/connection');
 const { Post, User, Vote } = require('../../models');
-const { removeAttribute } = require('../../models/Vote');
 
-
-/// get all users
+// get all users
 router.get('/', (req, res) => {
+    console.log('======================');
     Post.findAll({
-        // update the `.findAll()` method's attributes to look like this
         attributes: [
             'id',
             'post_url',
@@ -15,6 +13,7 @@ router.get('/', (req, res) => {
             'created_at',
             [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
         ],
+        order: [['created_at', 'DESC']],
         include: [
             {
                 model: User,
@@ -34,7 +33,6 @@ router.get('/:id', (req, res) => {
         where: {
             id: req.params.id
         },
-        // update the `.findAll()` method's attributes to look like this
         attributes: [
             'id',
             'post_url',
@@ -86,7 +84,6 @@ router.put('/upvote', (req, res) => {
         });
 });
 
-
 router.put('/:id', (req, res) => {
     Post.update(
         {
@@ -131,3 +128,4 @@ router.delete('/:id', (req, res) => {
 });
 
 module.exports = router;
+
